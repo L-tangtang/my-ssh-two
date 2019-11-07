@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="./js/iconfont/iconfont.css">
+    <link rel="stylesheet" href="./scss1/index.css">
+    <script src="./js/flexible.js"></script>
+</head>
+
+<body>
+    <div class='wrap'>
+        <header class="header">
+            <span>演出</span>
+            <span><img src="./img/6.jpg" alt=""></span>
+        </header>
+        <div class="nav">
+            <span><a href="./index.html">北京</a></span>
+            <span><input type="text" class='inp' placeholder="找艺人、演出、场馆"><b class='iconfont'>&#xe614;</b></span>
+        </div>
+        <main class="main">
+            <div class="content" data-top="下拉刷新" data-bottom="上啦加载">
+
+                <h4>-为你推荐-</h4>
+                <div class='icon-box'>
+                    <span>当前热门</span>
+                    <span>最新上架</span>
+                    <span>折扣演出</span>
+                    <span>全部时间</span>
+                </div>
+
+                <div class='dl-box'>
+                    <dl>
+                        <dt><img src="./img/4.jpg" alt=""></dt>
+                        <dd>
+                            <h3>新壶中天·桃园篇-首都东方文化</h3>
+                            <p>2018-08-23至2018-11-08</p>
+                            <p>北京 新壶中天</p>
+                            <p>60-288元</p>
+                        </dd>
+                        <dd><canvas class='myCanvas' width='150' height='150'></canvas></dd>
+                    </dl>
+                </div>
+            </div>
+        </main>
+        <footer class="footer">
+            <ul>
+                <li class='iconfont'>&#xe717;</li>
+                <li>电影</li>
+            </ul>
+            <ul>
+                <li class='iconfont'>&#xe717;</li>
+                <li>影院</li>
+            </ul>
+            <ul>
+                <li class='iconfont'>&#xe717;</li>
+                <li>演出</li>
+            </ul>
+            <ul>
+                <li class='iconfont'>&#xe717;</li>
+                <li>赛事</li>
+            </ul>
+            <ul>
+                <li class='iconfont'>&#xe617;</li>
+                <li>我的</li>
+            </ul>
+        </footer>
+
+    </div>
+
+    <script src="./js/ajax.js"></script>
+    <script src="js/bscroll.js"></script>
+
+    <script>
+
+        var Filter = function (opt) {
+            Object.assign(this, opt);
+            this.content = document.querySelector('.content');
+            this.inp = document.querySelector('.inp');
+            this.dlBox = document.querySelector('.dl-box');
+            this.lis = document.querySelectorAll('.icon-box span');
+
+            console.log(this.lis)
+
+
+            this.init();
+        }
+        Filter.prototype = {
+            constructor: Filter,
+            init: function () {
+                this.BscrollFn()
+                this.filterFn();
+                this.clickSpan();
+            },
+            getAjax: function () {
+                ajax('./moke/data.json', (list) => {
+                    this.rander(list)
+                })
+            },
+            //上啦加载 下拉刷新
+            BscrollFn: function () {
+                this.myBS = new BScroll('.main', {
+                    click: true,
+                    pullDownRefresh: {
+                        threshold: 180,
+                        stop: 80
+                    },
+                    pullUpLoad: {
+                        threshold: -100
+                    }
+                })
+
+                this.myBS.on('pullingDown', () => {
+                    this.content.dataset.top = '正在刷新';
+                    ajax('./moke/data.json', (list) => {
+                        setTimeout(() => {
+                            this.randerDir(list, 'top');
+                            this.content.dataset.top = '下拉刷新';
+                            this.myBS.finishPullDown();
+                            this.myBS.refresh();
+                        }, 2000)
+                    })
+                })
+                this.myBS.on('pullingUp', () => {
+                    this.content.dataset.bottom = '正在加载';
+                    ajax('./moke/data.json', (list) => {
+                        setTimeout(() => {
+                            this.randerDir(list, 'bottom');
+                            this.content.dataset.bottom = '上啦加载';
+                            this.myBS.finishPullUp();
+                            this.myBS.refresh();
+                        }, 2000)
+                    })
+                })
+            },
+            //渲染方向
+            randerDir: function (data, dir) {
+                this.res = data.map(item => {
+                    return `<dl>
+                            <dt><img src="${item.img}" alt=""></dt>
+                            <dd>
+                                <h3>${item.title}</h3>
+                                <p>${item.time}</p>
+                                <p>${item.dir}</p>
+                                <p>${item.price}元</p>
+                            </dd>
+                            <dd><canvas class='myCanvas' width='150' height='150'></canvas></dd>
+                        </dl>`;
+                }).join('');
+                if (dir === 'top') {
+                    this.dlBox.innerHTML = this.res;
+                } else if (dir === 'bottom') {
+                    this.dlBox.innerHTML += this.res;
+                }
+            },
+            //模糊搜索
+            filterFn: function () {
+                this.inp.oninput = () => {
+                    this.getAjax();
+                }
+            },
+            //模糊搜索渲染
+            rander: function (data, dir) {
+                this.res = data.map(item => {
+                    var val = this.inp.value.trim();
+                    if (item.title.includes(val)) {
+                        return `<dl>
+                            <dt><img src="${item.img}" alt=""></dt>
+                            <dd>
+                                <h3>${item.title}</h3>
+                                <p>${item.time}</p>
+                                <p>${item.dir}</p>
+                                <p>${item.price}元</p>
+                            </dd>
+                            <dd><canvas class='myCanvas' width='150' height='150'></canvas></dd>
+                        </dl>`;
+                    }
+                }).join('');
+                this.dlBox.innerHTML = this.res;
+                //清空盒子的innerHTML
+                // if (this.inp.value === '') {
+                //     console.log(4)
+                //     this.dlBox.innerHTML = '';
+                // }
+            },
+            //点击事件 
+            clickSpan: function () {
+                this.lis.forEach((item, index) => {
+                    item.onclick = () => {
+                        for (var i = 0; i < this.lis.length; i++) {
+                            this.lis[i].classList.remove('col');
+                        }
+                        item.classList.add('col');
+                        this.randerFn(index);
+                    }
+                })
+            },
+            //渲染点击事件对应的数据
+            randerFn: function (ind) {
+                ajax('./moke/data.json', (list) => {
+                    this.dlBox.innerHTML = list.map((item) => {
+                        if (ind === 0 && item.boole) {
+                            return ` <dl>
+                                        <dt><img src="${item.img}" alt=""></dt>
+                                        <dd>
+                                            <h3>${item.title}</h3>
+                                            <p>${item.time}</p>
+                                            <p>${item.dir}</p>
+                                            <p>${item.price}元</p>
+                                        </dd>
+                                        <dd><canvas class='myCanvas' width='150' height='150'></canvas></dd>
+                                    </dl>`
+                        } else if (ind === 1 && item.boole === false) {
+                            return ` <dl>
+                                        <dt><img src="${item.img}" alt=""></dt>
+                                        <dd>
+                                            <h3>${item.title}</h3>
+                                            <p>${item.time}</p>
+                                            <p>${item.dir}</p>
+                                            <p>${item.price}元</p>
+                                        </dd>
+                                        <dd><canvas class='myCanvas' width='150' height='150'></canvas></dd>
+                                    </dl>`
+                        }
+                    }).join('');
+                })
+            }
+
+        }
+        new Filter()
+
+    </script>
+</body>
+
+</html>

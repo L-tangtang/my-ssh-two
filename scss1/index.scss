@@ -1,0 +1,199 @@
+* {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    box-sizing: border-box;
+    text-decoration: none;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+}
+
+.wrap {
+    width: 100%;
+    height: 100%;
+}
+
+@function rem($font) {
+    @return $font / 37.5px * 1rem;
+}
+
+%juzhong {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.header {
+    width: 100%;
+    height: rem(45px);
+    background: #171C1F;
+    @extend %juzhong;
+    justify-content: space-between;
+    padding: 0 rem(10px);
+
+    span {
+        color: #fff;
+        font-size: rem(16px);
+
+        &:nth-child(2) {
+            width: rem(100px);
+            height: rem(35px);
+
+            img {
+                width: 100%;
+                height: 100%;
+            }
+        }
+    }
+}
+
+.nav {
+    width: 100%;
+    height: rem(40px);
+    background: #eee;
+    @extend %juzhong;
+    justify-content: space-between;
+    padding: 0 rem(10px);
+    position: relative;
+
+    span {
+        font-size: rem(16px);
+
+        &:nth-child(2) {
+            position: relative;
+
+            input {
+                text-align: center;
+                font-size: rem(14px);
+                width: rem(300px);
+                height: rem(25px);
+                border: 1px solid #eee;
+            }
+
+            b {
+                position: absolute;
+                top: rem(5px);
+                left: rem(60px);
+                font-size: rem(16px);
+                color: #ccc;
+            }
+        }
+    }
+}
+
+.main {
+    width: 100%;
+    height: 80%;
+    overflow: auto;
+}
+
+.content::before {
+    content: attr(data-top);
+    display: block;
+    width: 100%;
+    height: rem(40px);
+    background: gold;
+    font-size: rem(16px);
+    text-align: center;
+    line-height: rem(40px);
+    position: absolute;
+    top: rem(-40px);
+    left: 0;
+}
+
+.content::after {
+    content: attr(data-bottom);
+    display: block;
+    width: 100%;
+    height: rem(40px);
+    background: gold;
+    font-size: rem(16px);
+    text-align: center;
+    line-height: rem(40px);
+}
+
+h4 {
+    @extend %juzhong;
+    width: 100%;
+    height: rem(35px);
+    font-size: rem(16px);
+}
+
+.icon-box {
+    width: 100%;
+    height: rem(35px);
+    border-top: 1px solid #aaa;
+    border-bottom: 1px solid #aaa;
+    @extend %juzhong;
+
+    span {
+        @extend %juzhong;
+        width: 25%;
+        height: 100%;
+    }
+}
+
+.col {
+    background: red;
+    color: #fff;
+}
+
+.dl-box {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+
+    dl {
+        width: 100%;
+        height: rem(150px);
+        display: flex;
+
+
+        dt {
+            flex: 4;
+            @extend %juzhong;
+
+            img {
+                width: rem(100px);
+                height: rem(130px);
+                border-radius: rem(10px);
+            }
+        }
+
+        dd {
+            &:nth-child(2) {
+                flex: 6;
+                margin-top: rem(20px);
+
+                p {
+                    margin: rem(10px) 0;
+
+                    &:last-child {
+                        margin-top: rem(15px);
+                        color: red;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.footer {
+    width: 100%;
+    height: rem(45px);
+    border-top: 1px solid;
+    @extend %juzhong;
+
+    ul {
+        flex: 1;
+
+        li {
+            font-size: rem(16px);
+            @extend %juzhong;
+        }
+    }
+}
